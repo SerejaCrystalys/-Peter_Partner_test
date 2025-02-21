@@ -16,3 +16,14 @@ type SearchData = {
   symbol: string;
   type: string;
 };
+
+type QuoteData = {
+  c: number;
+  d: number;
+  dp: number;
+  h: number;
+  l: number;
+  o: number;
+  pc: number;
+  t: number;
+};

@@ -20,7 +20,7 @@ const Header = () => {
 
   useEffect(() => {
     if (!debounceValue) return;
-    //
+
     api.get.search(inputValue).then((data) => {
       if (data) {
         console.log(data);

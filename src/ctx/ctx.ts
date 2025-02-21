@@ -15,6 +15,10 @@ export class ApiCtx {
   get = {
     news: () => this.api_request("news?category=general"),
     search: (input: string) => this.api_request(`search?q=${input}`),
+    metric: (symbol: string) =>
+      this.api_request(`stock/metric?symbol=${symbol}&metric=all`),
+    quote: (symbol: string) =>
+      this.api_request(`quote?symbol=${symbol}&metric=all`),
   };
 }
 
