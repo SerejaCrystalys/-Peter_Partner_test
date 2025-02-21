@@ -9,3 +9,10 @@ type NewsData = {
   summary: string;
   url: string;
 };
+
+type SearchData = {
+  description: string;
+  displaySymbol: string;
+  symbol: string;
+  type: string;
+};

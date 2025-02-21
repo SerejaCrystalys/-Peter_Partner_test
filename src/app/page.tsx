@@ -19,7 +19,7 @@ export default function Home() {
   }, [api]);
 
   return (
-    <div>
+    <div className="bg-gray-700">
       <h1>News</h1>
 
       {news?.map((item) => {
