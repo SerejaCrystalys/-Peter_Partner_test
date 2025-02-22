@@ -43,8 +43,10 @@ const Header = () => {
 
   return (
     <>
-      <div className="flex justify-between p-5 bg-gray-800">
-        <Image height={50} width={50} alt="logo" src={"/images/logo.svg"} />
+      <div className="flex justify-between p-5 bg-gray-800  shadow-lg shadow-gray-800/50">
+        <Link href={`/`}>
+          <Image height={50} width={50} alt="logo" src={"/images/logo.svg"} />
+        </Link>
         <Dropdown
           menu={{ items }}
           trigger={["click"]}

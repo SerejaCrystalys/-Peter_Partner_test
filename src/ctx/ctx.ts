@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import axios from "axios";
+import { subscribe } from "diagnostics_channel";
 
 export class ApiCtx {
   private readonly api_request = async (url: string) => {
@@ -14,11 +15,12 @@ export class ApiCtx {
 
   private readonly socket_connection = async () => {
     const socket = new WebSocket(
-      "wss://ws.finnhub.io?token=cus7161r01qt2nciphs0cus7161r01qt2nciphsg"
+      `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
     );
 
     // Connection opened -> Subscribe
-    socket.addEventListener("open", function (event) {
+
+    socket.addEventListener("open", () => {
       socket.send(JSON.stringify({ type: "subscribe", symbol: "AAPL" }));
       socket.send(
         JSON.stringify({ type: "subscribe", symbol: "BINANCE:BTCUSDT" })
@@ -42,7 +44,10 @@ export class ApiCtx {
     quote: (symbol: string) =>
       this.api_request(`quote?symbol=${symbol}&metric=all`),
   };
-  socket = {
+  ws = {
+    get_socket: new WebSocket(
+      `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
+    ),
     init: () => this.socket_connection(),
   };
 }

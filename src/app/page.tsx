@@ -27,7 +27,13 @@ export default function Home() {
           <div key={item.id}>
             <h2>{item.headline}</h2>
 
-            <Image height={100} width={100} alt="image" src={item.image} />
+            <Image
+              height={100}
+              width={100}
+              alt="image"
+              src={item.image}
+              loading="lazy"
+            />
             {item.summary}
           </div>
         );

@@ -47,7 +47,7 @@ const Share = ({ params }: { params: Promise<{ symbol: string }> }) => {
       });
   }, [symbol]);
 
-  api.socket.init();
+  // api.socket.init();
 
   if (!quoteData) return <></>;
   // Подготовка данных для графика
