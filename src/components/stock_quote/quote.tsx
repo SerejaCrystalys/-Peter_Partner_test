@@ -41,7 +41,7 @@ const Quote = ({ symbol }: { symbol: string }) => {
         setQuoteData(data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Failed to fetch quote data");
         setLoading(false);
       });
