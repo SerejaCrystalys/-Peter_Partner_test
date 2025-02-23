@@ -67,7 +67,6 @@ const Quote = ({ symbol, filter, socketUpd }: Props) => {
     });
 
     if (foundItem) {
-      console.log(foundItem);
       setQuoteData(
         (prev) =>
           ({

@@ -44,8 +44,6 @@ export default function Home() {
     window.localStorage.setItem("symbols", JSON.stringify(symbols));
   }, [symbols]);
 
-  console.log(socketUpd);
-
   return (
     <div className="flex flex-col  bg-gray-50 h-100%">
       <div className="sticky top-5 m-5 text-">

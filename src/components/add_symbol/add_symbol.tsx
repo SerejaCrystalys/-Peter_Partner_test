@@ -27,8 +27,6 @@ const AddSymbolButton = ({
 
     api.get.search(inputValue).then((data) => {
       if (data) {
-        console.log(data);
-
         setItems(
           data.result.map((item: SearchData, index: number) => {
             return {
