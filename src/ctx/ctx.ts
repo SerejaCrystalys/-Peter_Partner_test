@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import axios from "axios";
-import { subscribe } from "diagnostics_channel";
 
 export class ApiCtx {
   private readonly api_request = async (url: string) => {
@@ -13,27 +12,27 @@ export class ApiCtx {
     return data!.data;
   };
 
-  private readonly socket_connection = async () => {
-    const socket = new WebSocket(
-      `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
-    );
+  private readonly socket = new WebSocket(
+    `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
+  );
 
-    // Connection opened -> Subscribe
-
-    socket.addEventListener("open", () => {
-      socket.send(JSON.stringify({ type: "subscribe", symbol: "AAPL" }));
-      socket.send(
-        JSON.stringify({ type: "subscribe", symbol: "BINANCE:BTCUSDT" })
-      );
-      socket.send(
-        JSON.stringify({ type: "subscribe", symbol: "IC MARKETS:1" })
-      );
+  private readonly socket_subscribe = async (symbols: string[]) => {
+    this.socket.addEventListener("open", () => {
+      this.socket.send(`{'type':'subscribe','symbol':'AAPL'}`);
+      console.log("open", symbols);
+      symbols.forEach((item) => {
+        console.log(JSON.stringify({ type: "subscribe", symbol: item }));
+        this.socket.send(JSON.stringify({ type: "subscribe", symbol: item }));
+      });
     });
-
+    let data;
     // Listen for messages
-    socket.addEventListener("message", function (event) {
-      console.log("Message from server ", JSON.parse(event.data));
+    this.socket.addEventListener("message", function (event) {
+      data = JSON.parse(event.data);
+      console.log(data);
     });
+
+    return data;
   };
 
   get = {
@@ -45,10 +44,12 @@ export class ApiCtx {
       this.api_request(`quote?symbol=${symbol}&metric=all`),
   };
   ws = {
-    get_socket: new WebSocket(
-      `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
-    ),
-    init: () => this.socket_connection(),
+    subscribe: (symbols: string[]) => this.socket_subscribe(symbols),
+    unsubscribe: (symbols: string[]) => {
+      symbols.forEach((item) => {
+        this.socket.send(JSON.stringify({ type: "unsubscribe", symbol: item }));
+      });
+    },
   };
 }
 

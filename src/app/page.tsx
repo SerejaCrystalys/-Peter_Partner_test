@@ -1,43 +1,34 @@
 "use client";
 import apiCtx from "@/ctx/ctx";
-import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
+import Quote from "@/components/stock_quote/quote";
+import AddSymbolButton from "@/components/add_symbol/add_symbol";
 
 export default function Home() {
   const api = useContext(apiCtx);
-  const [news, setNews] = useState<[NewsData] | null>(null);
+  const [symbols, setSymbols] = useState<string[] | null>(
+    JSON.parse(window.localStorage.getItem("symbols")!)
+  );
 
   useEffect(() => {
-    api.get
-      .news()
-      .then((data) => {
-        setNews(data);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch news:", error);
-      });
-  }, [api]);
+    const localSymbols = window.localStorage.getItem("symbols");
+    if (!localSymbols) {
+      window.localStorage.setItem("symbols", JSON.stringify(symbols));
+    } else setSymbols(JSON.parse(localSymbols!));
+  }, [window.localStorage.getItem("symbols")]);
+
+  useEffect(() => {
+    if (symbols) api.ws.subscribe(symbols);
+
+    window.localStorage.setItem("symbols", JSON.stringify(symbols));
+  }, [symbols]);
 
   return (
-    <div className="bg-gray-700">
-      <h1>News</h1>
-
-      {news?.map((item) => {
-        return (
-          <div key={item.id}>
-            <h2>{item.headline}</h2>
-
-            <Image
-              height={100}
-              width={100}
-              alt="image"
-              src={item.image}
-              loading="lazy"
-            />
-            {item.summary}
-          </div>
-        );
+    <div className="flex flex-col  bg-gray-50 h-100%">
+      {symbols?.map((item: string, index) => {
+        return <Quote key={index} symbol={item} />;
       })}
+      <AddSymbolButton symbols={symbols} setSymbols={setSymbols} />
     </div>
   );
 }

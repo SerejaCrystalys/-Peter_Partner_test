@@ -1,6 +1,7 @@
 "use client";
+
 import apiCtx from "@/ctx/ctx";
-import React, { useContext, useEffect, useState, use } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -24,8 +25,7 @@ ChartJS.register(
   Legend
 );
 
-const Share = ({ params }: { params: Promise<{ symbol: string }> }) => {
-  const { symbol } = use(params);
+const Quote = ({ symbol }: { symbol: string }) => {
   const api = useContext(apiCtx);
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ const Share = ({ params }: { params: Promise<{ symbol: string }> }) => {
         setError("Failed to fetch quote data");
         setLoading(false);
       });
-  }, [symbol]);
+  }, []);
 
   // api.socket.init();
 
@@ -85,6 +85,7 @@ const Share = ({ params }: { params: Promise<{ symbol: string }> }) => {
       },
       title: {
         display: true,
+
         text: `Stock Quote for ${symbol}`,
       },
     },
@@ -108,11 +109,11 @@ const Share = ({ params }: { params: Promise<{ symbol: string }> }) => {
   }
 
   return (
-    <div style={{ width: "600px", margin: "0 auto" }}>
+    <div style={{ width: "600px", margin: "20px auto" }}>
       <h2>{symbol} Stock Quote</h2>
       <Line data={data} options={options} />
     </div>
   );
 };
 
-export default Share;
+export default Quote;
