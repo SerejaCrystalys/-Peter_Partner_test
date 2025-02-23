@@ -56,6 +56,8 @@ export default function Home() {
         />
       </div>
 
+      <AddSymbolButton symbols={symbols} setSymbols={setSymbols} />
+
       {symbols?.map((item: string, index) => {
         return (
           <Quote
@@ -66,7 +68,6 @@ export default function Home() {
           />
         );
       })}
-      <AddSymbolButton symbols={symbols} setSymbols={setSymbols} />
     </div>
   );
 }
