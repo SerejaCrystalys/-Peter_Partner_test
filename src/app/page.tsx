@@ -6,16 +6,14 @@ import AddSymbolButton from "@/components/add_symbol/add_symbol";
 
 export default function Home() {
   const api = useContext(apiCtx);
-  const [symbols, setSymbols] = useState<string[] | null>(
-    JSON.parse(window.localStorage.getItem("symbols")!)
-  );
+  const [symbols, setSymbols] = useState<string[] | null>(null);
 
   useEffect(() => {
     const localSymbols = window.localStorage.getItem("symbols");
     if (!localSymbols) {
       window.localStorage.setItem("symbols", JSON.stringify(symbols));
     } else setSymbols(JSON.parse(localSymbols!));
-  }, [window.localStorage.getItem("symbols")]);
+  }, []);
 
   useEffect(() => {
     if (symbols) api.ws.subscribe(symbols);
