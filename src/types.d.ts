@@ -27,3 +27,7 @@ type QuoteData = {
   pc: number;
   t: number;
 };
+
+type Wrapper<T> = {
+  data: T[]; // data — это массив элементов типа T
+};

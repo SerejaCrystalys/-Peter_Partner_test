@@ -12,10 +12,11 @@ const AddSymbolButton = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [gettedSymbol, setGettedSymbol] = useState("");
   const [items, setItems] = useState<MenuProps["items"]>([]);
 
   const api = useContext(apiCtx);
-  const debounceValue = useDebouncedValue(inputValue, 500);
+  const debounceValue = useDebouncedValue(inputValue, 100);
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.currentTarget.value);
@@ -33,7 +34,12 @@ const AddSymbolButton = ({
             return {
               key: index,
               label: (
-                <div onClick={() => setInputValue(item.displaySymbol)}>
+                <div
+                  onClick={() => {
+                    setInputValue(item.displaySymbol);
+                    setGettedSymbol(item.symbol);
+                  }}
+                >
                   {item.displaySymbol}
                 </div>
               ),
@@ -49,7 +55,7 @@ const AddSymbolButton = ({
 
   const handleOk = () => {
     setIsModalOpen(false);
-    setSymbols([...symbols, inputValue]);
+    setSymbols([...symbols, gettedSymbol]);
   };
 
   const handleCancel = () => {
@@ -58,7 +64,7 @@ const AddSymbolButton = ({
 
   return (
     <>
-      <Button className="self-center" onClick={showModal}>
+      <Button className="self-center mt-5" onClick={showModal}>
         Add symbol
       </Button>
       <Modal
@@ -69,7 +75,7 @@ const AddSymbolButton = ({
       >
         <Dropdown
           menu={{ items }}
-          trigger={["click"]}
+          trigger={["click", "hover"]}
           overlayStyle={{
             paddingTop: "8px",
           }}

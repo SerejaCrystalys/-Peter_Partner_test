@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <>
       <div className="flex justify-between p-5 bg-gray-500  shadow-lg shadow-gray-800/50">
-        <Link href={`/`}>
+        <Link href={`https://peterpartner.net/`}>
           <Image height={50} width={50} alt="logo" src={"/images/logo.svg"} />
         </Link>
       </div>

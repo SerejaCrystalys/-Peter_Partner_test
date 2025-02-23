@@ -13,10 +13,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import useQuoteData from "./quote_data";
 
-// Регистрируем необходимые компоненты Chart.js
 ChartJS.register(
-  CategoryScale, // Регистрируем шкалу для категорий
+  CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
@@ -25,16 +25,28 @@ ChartJS.register(
   Legend
 );
 
-const Quote = ({ symbol }: { symbol: string }) => {
-  const api = useContext(apiCtx);
+interface Props {
+  symbol: string;
+  filter: string;
+  socketUpd:
+    | {
+        s: string;
+        p: number;
+      }[]
+    | undefined;
+}
+
+const Quote = ({ symbol, filter, socketUpd }: Props) => {
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Загрузка данных котировки
+
+  const api = useContext(apiCtx);
+  const { data, options } = useQuoteData(quoteData, symbol);
+
   useEffect(() => {
     setLoading(true);
     setError(null);
-
     api.get
       .quote(symbol)
       .then((data) => {
@@ -47,60 +59,31 @@ const Quote = ({ symbol }: { symbol: string }) => {
       });
   }, []);
 
-  // api.socket.init();
+  useEffect(() => {
+    if (!socketUpd || !symbol) return; // Проверяем, что socketUpd и symbol существуют
 
-  if (!quoteData) return <></>;
-  // Подготовка данных для графика
-  const data = {
-    labels: ["Previous Close", "Open", "High", "Low", "Current Price"],
-    datasets: [
-      {
-        label: "Price",
-        data: [
-          quoteData?.pc, // Цена закрытия предыдущего дня
-          quoteData?.o, // Цена открытия
-          quoteData?.h, // Максимальная цена
-          quoteData?.l, // Минимальная цена
-          quoteData?.c, // Текущая цена
-        ],
-        borderColor:
-          quoteData?.c >= quoteData?.o
-            ? "rgba(75, 192, 192, 1)"
-            : "rgba(255, 99, 132, 1)", // Зеленый или красный
-        backgroundColor:
-          quoteData?.c >= quoteData?.o
-            ? "rgba(75, 192, 192, 0.2)"
-            : "rgba(255, 99, 132, 0.2)", // Зеленый или красный
-        borderWidth: 2,
-      },
-    ],
-  };
+    const foundItem = socketUpd.find((item) => {
+      return item.s.includes(symbol); // Ищем symbol в item.s
+    });
 
-  // Настройки графика
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
+    if (foundItem) {
+      console.log(foundItem);
+      setQuoteData(
+        (prev) =>
+          ({
+            ...prev, // Копируем все поля из предыдущего состояния
+            c: foundItem.p, // Обновляем только поле `c`
+          } as QuoteData)
+      );
+    }
+  }, [socketUpd, symbol]);
 
-        text: `Stock Quote for ${symbol}`,
-      },
-    },
-    scales: {
-      x: {
-        type: "category", // Используем категориальную шкалу для оси X
-        labels: ["Previous Close", "Open", "High", "Low", "Current Price"],
-      },
-      y: {
-        beginAtZero: false, // Начинаем ось Y не с нуля
-      },
-    },
-  };
+  const calculatePercentageChange = (
+    initialValue: number,
+    currentValue: number
+  ) => ((currentValue - initialValue) / initialValue) * 100;
 
-  if (loading) {
+  if (loading || !quoteData) {
     return <div>Loading...</div>;
   }
 
@@ -108,13 +91,37 @@ const Quote = ({ symbol }: { symbol: string }) => {
     return <div>Error: {error}</div>;
   }
 
-  return (
-    <div style={{ width: "600px", margin: "20px auto" }}>
-      <h2>{symbol} Stock Quote</h2>
-      {/* @ts-expect-error 123 */}
-      <Line data={data} options={options} />
-    </div>
-  );
+  switch (filter) {
+    case "fall":
+      if (calculatePercentageChange(quoteData.o, quoteData.c) > 0) {
+        return <></>;
+      }
+      break;
+    case "grow":
+      if (calculatePercentageChange(quoteData.o, quoteData.c) < 0) {
+        return <></>;
+      }
+      break;
+    default:
+      return (
+        <div className="flex flex-auto m-auto">
+          <div style={{ width: "600px", margin: "50px auto" }}>
+            <h2>{symbol} Quote</h2>
+            {/* @ts-expect-error 123 */}
+            <Line data={data} options={options} />
+          </div>
+          <div className="flex flex-col gap-3 self-center">
+            <div>
+              24H Change{" "}
+              {calculatePercentageChange(quoteData.o, quoteData.c).toFixed(2)}%
+            </div>
+            <div>Price {quoteData.c}</div>
+            <div>24H High {quoteData.h}</div>
+            <div>24H Low {quoteData.l}</div>
+          </div>
+        </div>
+      );
+  }
 };
 
 export default Quote;

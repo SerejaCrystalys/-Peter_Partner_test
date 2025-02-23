@@ -8,31 +8,26 @@ export class ApiCtx {
         `https://finnhub.io/api/v1/${url}&token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
       )
       .catch((e) => console.log(e));
-    // console.log(data!.data);
     return data!.data;
   };
 
-  private readonly socket = new WebSocket(
-    `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
-  );
-
-  private readonly socket_subscribe = async (symbols: string[]) => {
-    this.socket.addEventListener("open", () => {
-      this.socket.send(`{'type':'subscribe','symbol':'AAPL'}`);
-      console.log("open", symbols);
+  private readonly socket_subscribe = (
+    symbols: string[],
+    callback: (data: Wrapper<{ s: string; p: number }>) => void
+  ) => {
+    const socket = new WebSocket(
+      `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_FINHUB_API_KEY}`
+    );
+    socket.addEventListener("open", () => {
       symbols.forEach((item) => {
-        console.log(JSON.stringify({ type: "subscribe", symbol: item }));
-        this.socket.send(JSON.stringify({ type: "subscribe", symbol: item }));
+        socket.send(JSON.stringify({ type: "subscribe", symbol: item }));
       });
     });
-    let data;
-    // Listen for messages
-    this.socket.addEventListener("message", function (event) {
-      data = JSON.parse(event.data);
-      console.log(data);
-    });
 
-    return data;
+    socket.addEventListener("message", function (event) {
+      const parsedData = JSON.parse(event.data);
+      callback(parsedData); // Вызываем callback с данными
+    });
   };
 
   get = {
@@ -44,12 +39,10 @@ export class ApiCtx {
       this.api_request(`quote?symbol=${symbol}&metric=all`),
   };
   ws = {
-    subscribe: (symbols: string[]) => this.socket_subscribe(symbols),
-    unsubscribe: (symbols: string[]) => {
-      symbols.forEach((item) => {
-        this.socket.send(JSON.stringify({ type: "unsubscribe", symbol: item }));
-      });
-    },
+    subscribe: (
+      symbols: string[],
+      callback: (data: Wrapper<{ s: string; p: number }>) => void
+    ) => this.socket_subscribe(symbols, callback),
   };
 }
 
