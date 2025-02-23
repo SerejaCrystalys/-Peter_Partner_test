@@ -7,7 +7,7 @@ const AddSymbolButton = ({
   symbols,
   setSymbols,
 }: {
-  symbols: string[] | null;
+  symbols: string[];
   setSymbols: (value: string[]) => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,7 +49,7 @@ const AddSymbolButton = ({
 
   const handleOk = () => {
     setIsModalOpen(false);
-    setSymbols([...symbols!, inputValue]);
+    setSymbols([...symbols, inputValue]);
   };
 
   const handleCancel = () => {
