@@ -111,6 +111,7 @@ const Quote = ({ symbol }: { symbol: string }) => {
   return (
     <div style={{ width: "600px", margin: "20px auto" }}>
       <h2>{symbol} Stock Quote</h2>
+      {/* @ts-expect-error 123 */}
       <Line data={data} options={options} />
     </div>
   );
