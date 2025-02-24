@@ -28,7 +28,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (symbols[1]) {
+    if (symbols.length) {
       api.ws.subscribe(symbols, (data: Wrapper<{ s: string; p: number }>) => {
         setSocketUpd(
           data.data.map((item: { s: string; p: number }) => {

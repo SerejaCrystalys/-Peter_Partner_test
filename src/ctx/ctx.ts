@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { createContext } from "react";
 import axios from "axios";
 
@@ -27,7 +27,7 @@ export class ApiCtx {
 
     socket.addEventListener("message", function (event) {
       const parsedData = JSON.parse(event.data);
-      callback(parsedData); // Вызываем callback с данными
+      callback(parsedData);
     });
   };
 
